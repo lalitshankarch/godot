@@ -50,6 +50,9 @@ void LabelSettings::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_font_color", "color"), &LabelSettings::set_font_color);
 	ClassDB::bind_method(D_METHOD("get_font_color"), &LabelSettings::get_font_color);
 
+	ClassDB::bind_method(D_METHOD("set_disabled_color", "color"), &LabelSettings::set_disabled_color);
+	ClassDB::bind_method(D_METHOD("get_disabled_color"), &LabelSettings::get_disabled_color);
+
 	ClassDB::bind_method(D_METHOD("set_outline_size", "size"), &LabelSettings::set_outline_size);
 	ClassDB::bind_method(D_METHOD("get_outline_size"), &LabelSettings::get_outline_size);
 
@@ -96,6 +99,7 @@ void LabelSettings::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "font", PROPERTY_HINT_RESOURCE_TYPE, "Font"), "set_font", "get_font");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "font_size", PROPERTY_HINT_RANGE, "1,1024,1,or_greater,suffix:px"), "set_font_size", "get_font_size");
 	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "font_color"), "set_font_color", "get_font_color");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "disabled_color"), "set_disabled_color", "get_disabled_color");
 
 	ADD_GROUP("Outline", "outline_");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "outline_size", PROPERTY_HINT_RANGE, "0,127,1,or_greater,suffix:px"), "set_outline_size", "get_outline_size");
@@ -187,6 +191,17 @@ void LabelSettings::set_font_color(const Color &p_color) {
 
 Color LabelSettings::get_font_color() const {
 	return font_color;
+}
+
+void LabelSettings::set_disabled_color(const Color &p_color) {
+	if (disabled_color != p_color) {
+		disabled_color = p_color;
+		emit_changed();
+	}
+}
+
+Color LabelSettings::get_disabled_color() const {
+	return disabled_color;
 }
 
 void LabelSettings::set_outline_size(int p_size) {

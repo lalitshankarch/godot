@@ -752,6 +752,7 @@ void Label::_notification(int p_what) {
 			int font_size = settings.is_valid() ? settings->get_font_size() : theme_cache.font_size;
 			int font_h = font->get_height(font_size);
 			Color font_color = has_settings ? settings->get_font_color() : theme_cache.font_color;
+			Color font_disabled_color = has_settings ? settings->get_font_color() : theme_cache.font_disabled_color;
 			Color font_shadow_color = has_settings ? settings->get_shadow_color() : theme_cache.font_shadow_color;
 			Point2 shadow_ofs = has_settings ? settings->get_shadow_offset() : theme_cache.font_shadow_offset;
 			int paragraph_spacing = has_settings ? settings->get_paragraph_spacing() : theme_cache.paragraph_spacing;
@@ -872,7 +873,9 @@ void Label::_notification(int p_what) {
 						}
 
 						// Draw text.
-						{
+						if (text_disabled) {
+							draw_text(rtl, ellipsis_pos, ellipsis_gl_size, ellipsis_glyphs, trim_chars, para.start, visible_chars, trim_glyphs_ltr, processed_glyphs_step, processed_glyphs, visible_glyphs, trim_glyphs_rtl, total_glyphs, ci, ofs, gl_size, trim_pos, glyphs, font_disabled_color, draw_glyph);
+						} else {
 							draw_text(rtl, ellipsis_pos, ellipsis_gl_size, ellipsis_glyphs, trim_chars, para.start, visible_chars, trim_glyphs_ltr, processed_glyphs_step, processed_glyphs, visible_glyphs, trim_glyphs_rtl, total_glyphs, ci, ofs, gl_size, trim_pos, glyphs, font_color, draw_glyph);
 						}
 
@@ -1096,6 +1099,29 @@ void Label::set_text(const String &p_string) {
 	queue_redraw();
 	update_minimum_size();
 	update_configuration_warnings();
+}
+
+void Label::set_disabled(bool p_disabled) {
+	if (text_disabled == p_disabled) {
+		return;
+	}
+	text_disabled = p_disabled;
+	queue_accessibility_update();
+	queue_redraw();
+	update_minimum_size();
+}
+
+bool Label::is_disabled() const {
+	return text_disabled;
+}
+
+void Label::disabled() {}
+
+void Label::_toggled() {
+	set_disabled(!text_disabled);
+	GDVIRTUAL_CALL(_toggled);
+	disabled();
+	emit_signal(SceneStringName(toggled));
 }
 
 void Label::_invalidate() {
@@ -1367,6 +1393,8 @@ void Label::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_vertical_alignment"), &Label::get_vertical_alignment);
 	ClassDB::bind_method(D_METHOD("set_text", "text"), &Label::set_text);
 	ClassDB::bind_method(D_METHOD("get_text"), &Label::get_text);
+	ClassDB::bind_method(D_METHOD("set_disabled", "disabled"), &Label::set_disabled);
+	ClassDB::bind_method(D_METHOD("is_disabled"), &Label::is_disabled);
 	ClassDB::bind_method(D_METHOD("set_label_settings", "settings"), &Label::set_label_settings);
 	ClassDB::bind_method(D_METHOD("get_label_settings"), &Label::get_label_settings);
 	ClassDB::bind_method(D_METHOD("set_text_direction", "direction"), &Label::set_text_direction);
@@ -1412,6 +1440,10 @@ void Label::_bind_methods() {
 
 	ClassDB::bind_method(D_METHOD("get_character_bounds", "pos"), &Label::get_character_bounds);
 
+	GDVIRTUAL_BIND(_toggled);
+	ADD_SIGNAL(MethodInfo("toggled"));
+
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "disabled"), "set_disabled", "is_disabled");
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "text", PROPERTY_HINT_MULTILINE_TEXT), "set_text", "get_text");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "label_settings", PROPERTY_HINT_RESOURCE_TYPE, "LabelSettings"), "set_label_settings", "get_label_settings");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "horizontal_alignment", PROPERTY_HINT_ENUM, "Left,Center,Right,Fill"), "set_horizontal_alignment", "get_horizontal_alignment");
@@ -1453,6 +1485,7 @@ void Label::_bind_methods() {
 	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_CONSTANT, Label, font_shadow_offset.x, "shadow_offset_x");
 	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_CONSTANT, Label, font_shadow_offset.y, "shadow_offset_y");
 	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, Label, font_outline_color);
+	BIND_THEME_ITEM(Theme::DATA_TYPE_COLOR, Label, font_disabled_color);
 	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_CONSTANT, Label, font_outline_size, "outline_size");
 	BIND_THEME_ITEM_CUSTOM(Theme::DATA_TYPE_CONSTANT, Label, font_shadow_outline_size, "shadow_outline_size");
 }

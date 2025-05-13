@@ -57,6 +57,7 @@ private:
 	Ref<Font> font;
 	int font_size = Font::DEFAULT_FONT_SIZE;
 	Color font_color = Color(1, 1, 1);
+	Color disabled_color = Color(1, 1, 1);
 
 	int outline_size = 0;
 	Color outline_color = Color(1, 1, 1);
@@ -109,6 +110,9 @@ public:
 
 	void set_font_color(const Color &p_color);
 	Color get_font_color() const;
+
+	void set_disabled_color(const Color &p_color);
+	Color get_disabled_color() const;
 
 	void set_outline_size(int p_size);
 	int get_outline_size() const;

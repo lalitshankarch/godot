@@ -379,6 +379,7 @@ void fill_default_theme(Ref<Theme> &theme, const Ref<Font> &default_font, const 
 	theme->set_font_size(SceneStringName(font_size), "Label", -1);
 
 	theme->set_color(SceneStringName(font_color), "Label", Color(1, 1, 1));
+	theme->set_color("font_disabled_color", "Label", control_font_disabled_color);
 	theme->set_color("font_shadow_color", "Label", Color(0, 0, 0, 0));
 	theme->set_color("font_outline_color", "Label", Color(0, 0, 0));
 

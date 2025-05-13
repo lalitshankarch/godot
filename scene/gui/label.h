@@ -49,6 +49,7 @@ private:
 	TextServer::OverrunBehavior overrun_behavior = TextServer::OVERRUN_NO_TRIMMING;
 	mutable Size2 minsize;
 	bool uppercase = false;
+	bool text_disabled = false;
 
 	struct Paragraph {
 		bool lines_dirty = true;
@@ -92,6 +93,7 @@ private:
 		Color font_shadow_color;
 		Point2 font_shadow_offset;
 		Color font_outline_color;
+		Color font_disabled_color;
 		int font_outline_size;
 		int font_shadow_outline_size;
 	} theme_cache;
@@ -101,14 +103,17 @@ private:
 	void _update_visible() const;
 	void _shape() const;
 	void _invalidate();
+	void _toggled();
 
 protected:
 	RID get_line_rid(int p_line) const;
 	Rect2 get_line_rect(int p_line) const;
 	int get_layout_data(Vector2 &r_offset, int &r_last_line, int &r_line_spacing) const;
-
+	virtual void disabled();
 	void _notification(int p_what);
 	static void _bind_methods();
+
+	GDVIRTUAL0(_toggled)
 #ifndef DISABLE_DEPRECATED
 	bool _set(const StringName &p_name, const Variant &p_value);
 #endif
@@ -125,6 +130,9 @@ public:
 
 	void set_text(const String &p_string);
 	String get_text() const;
+
+	void set_disabled(bool p_disabled);
+	bool is_disabled() const;
 
 	void set_label_settings(const Ref<LabelSettings> &p_settings);
 	Ref<LabelSettings> get_label_settings() const;
